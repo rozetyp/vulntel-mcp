@@ -245,11 +245,17 @@ them to judge patched vs. unpatched vs. fossil. It makes no vulnerability judgme
 
 | arg | type | default | notes |
 |---|---|---|---|
-| `code` | string | — | **required** — a distinctive line or symbol, e.g. `"VP8LBuildHuffmanTable"` |
-| `lang` | string | `c` | language filter |
+| `code` | string | — | **required**: a distinctive symbol or short fragment, e.g. `"VP8LBuildHuffmanTable"`, `"yaml.load("` |
+| `lang` | string | all languages | optional filter, e.g. `"c"`, `"python"`, `"javascript"` |
 | `limit` | int | `50` | max hits |
 
-**Returns:** `count` and `matches[]` (`repo`, `file`, `url`, `snippet`).
+**Returns:** `count`, `lang`, `partial` and `matches[]` (`repo`, `file`, `url`, `snippet`); a `hint` when the result
+is empty or partial.
+
+**Speed.** A search stops at `limit` hits, usually in 2 to 3 seconds. A string with few exact matches makes the search
+scan everything, so each search is capped at about 10 seconds: `partial: true` means the cap was hit with fewer than
+`limit` hits. The shortest distinctive token (a function or symbol name) is both faster and more likely to match than
+a whole line.
 
 ```jsonc
 search_public_code(code="VP8LBuildHuffmanTable", lang="c")
